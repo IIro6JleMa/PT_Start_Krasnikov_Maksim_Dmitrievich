@@ -1,0 +1,39 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+}
+
+.nav_text h3 {
+    font-size: 1.8rem;
+    color: #ffc107;
+}
+
+.profile_photo img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.profile_photo img:hover {
+    transform: scale(1.1);
+}
+
+.title_photo {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #d0d1da;
+}
+
+
+footer {
+    background-color: #343a40;
+    color: #fff;
+}
+button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #fa0505;
+    color: rgb(252, 2, 2);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
