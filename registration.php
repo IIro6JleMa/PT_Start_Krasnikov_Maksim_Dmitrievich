@@ -1,9 +1,9 @@
 <?php
 // Подключаем файл для работы с базой данных
-require_once('db.php');
+require_once('bd.php');
 
 // Подключаемся к базе данных
-$link = mysqli_connect('127.0.0.1', 'root', 'password', 'name_db');
+$link = mysqli_connect('127.0.0.1', 'root', 'maks', 'first');
 
 // Проверка, отправлена ли форма
 if (isset($_POST['submit'])) {
