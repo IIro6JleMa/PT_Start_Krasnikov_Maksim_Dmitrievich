@@ -2,7 +2,7 @@
 require_once('bd.php');  // Подключаем файл для работы с БД
 
 // Проверяем подключение к базе данных
-$link = mysqli_connect('127.0.0.1', 'root', 'password', 'first');
+$link = mysqli_connect('127.0.0.1', 'root', 'maks', 'first');
 if (!$link) {
     die("Ошибка подключения к базе данных: " . mysqli_connect_error());
 }
@@ -10,14 +10,38 @@ if (!$link) {
 if (isset($_POST['submit'])) {
     $title = trim($_POST['title']);
     $main_text = trim($_POST['text']);
+    $file_path = null; // По умолчанию файл не загружен
 
     // Проверка на заполнение полей
     if (!$title || !$main_text) {
         die("Заполните все поля.");
     }
 
-    // Добавляем отладку SQL-запроса
-    $sql = "INSERT INTO posts (title, main_text) VALUES ('$title', '$main_text')";
+    // Обработка загрузки файла
+    if (!empty($_FILES["file"]["name"])) {
+        // Проверяем тип файла и его размер (до 100 KB)
+        if ((($_FILES["file"]["type"] == "image/gif") || ($_FILES["file"]["type"] == "image/jpeg")
+            || ($_FILES["file"]["type"] == "image/jpg") || ($_FILES["file"]["type"] == "image/pjpeg")
+            || ($_FILES["file"]["type"] == "image/x-png") || ($_FILES["file"]["type"] == "image/png"))
+            && ($_FILES["file"]["size"] < 102400)) {
+
+            // Генерация уникального имени файла
+            $file_name = time() . "_" . basename($_FILES["file"]["name"]);
+            $target_file = "upload/" . $file_name;
+
+            // Перемещаем файл в папку upload
+            if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+                $file_path = $target_file; // Сохраняем путь к файлу
+            } else {
+                echo "Ошибка при загрузке файла!";
+            }
+        } else {
+            echo "Недопустимый тип файла или размер превышает 100KB.";
+        }
+    }
+
+    // SQL-запрос для добавления поста с возможным файлом
+    $sql = "INSERT INTO posts (title, main_text, file_path) VALUES ('$title', '$main_text', '$file_path')";
     if (!mysqli_query($link, $sql)) {
         die("Не удалось добавить пост: " . mysqli_error($link));
     } else {
@@ -69,11 +93,12 @@ mysqli_close($link);
                 </p>
                 <button id="toggle-btn" class="btn btn-primary my-4">Показать другую картинку</button>
 
-                <!-- Форма для создания постов -->
-                <form method="POST" action="profile.php" class="form my-4">
+                <!-- Форма для создания постов с загрузкой файла -->
+                <form method="POST" action="profile.php" enctype="multipart/form-data" class="form my-4">
                     <h3>Создать пост</h3>
                     <input type="text" name="title" placeholder="Заголовок поста" class="form-control my-2" required>
                     <textarea name="text" rows="5" placeholder="Текст поста" class="form-control my-2" required></textarea>
+                    <input type="file" name="file" class="form-control my-2">
                     <button type="submit" name="submit" class="btn btn-primary">Опубликовать</button>
                 </form>
             </div>
