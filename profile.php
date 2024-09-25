@@ -2,15 +2,7 @@
 require_once('bd.php');  // Подключаем файл для работы с БД
 
 // Проверяем подключение к базе данных
-<<<<<<< HEAD
 $link = mysqli_connect('127.0.0.1', 'root', 'maks', 'first');
-=======
-<<<<<<< HEAD
-$link = mysqli_connect('127.0.0.1', 'root', 'maks', 'first');
-=======
-$link = mysqli_connect('127.0.0.1', 'root', 'password', 'first');
->>>>>>> 9b44337f16a75bffa1859d53ce3f5a127cc85e64
->>>>>>> 07567a919c4b45d5551dbee9cb6e05fc80878c30
 if (!$link) {
     die("Ошибка подключения к базе данных: " . mysqli_connect_error());
 }
@@ -18,24 +10,13 @@ if (!$link) {
 if (isset($_POST['submit'])) {
     $title = trim($_POST['title']);
     $main_text = trim($_POST['text']);
-<<<<<<< HEAD
     $file_path = null; // По умолчанию файл не загружен
-=======
-<<<<<<< HEAD
-    $file_path = null; // По умолчанию файл не загружен
-=======
->>>>>>> 9b44337f16a75bffa1859d53ce3f5a127cc85e64
->>>>>>> 07567a919c4b45d5551dbee9cb6e05fc80878c30
 
     // Проверка на заполнение полей
     if (!$title || !$main_text) {
         die("Заполните все поля.");
     }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 07567a919c4b45d5551dbee9cb6e05fc80878c30
     // Обработка загрузки файла
     if (!empty($_FILES["file"]["name"])) {
         // Проверяем тип файла и его размер (до 100 KB)
@@ -61,13 +42,6 @@ if (isset($_POST['submit'])) {
 
     // SQL-запрос для добавления поста с возможным файлом
     $sql = "INSERT INTO posts (title, main_text, file_path) VALUES ('$title', '$main_text', '$file_path')";
-<<<<<<< HEAD
-=======
-=======
-    // Добавляем отладку SQL-запроса
-    $sql = "INSERT INTO posts (title, main_text) VALUES ('$title', '$main_text')";
->>>>>>> 9b44337f16a75bffa1859d53ce3f5a127cc85e64
->>>>>>> 07567a919c4b45d5551dbee9cb6e05fc80878c30
     if (!mysqli_query($link, $sql)) {
         die("Не удалось добавить пост: " . mysqli_error($link));
     } else {
@@ -119,29 +93,12 @@ mysqli_close($link);
                 </p>
                 <button id="toggle-btn" class="btn btn-primary my-4">Показать другую картинку</button>
 
-<<<<<<< HEAD
                 <!-- Форма для создания постов с загрузкой файла -->
                 <form method="POST" action="profile.php" enctype="multipart/form-data" class="form my-4">
                     <h3>Создать пост</h3>
                     <input type="text" name="title" placeholder="Заголовок поста" class="form-control my-2" required>
                     <textarea name="text" rows="5" placeholder="Текст поста" class="form-control my-2" required></textarea>
                     <input type="file" name="file" class="form-control my-2">
-=======
-<<<<<<< HEAD
-                <!-- Форма для создания постов с загрузкой файла -->
-                <form method="POST" action="profile.php" enctype="multipart/form-data" class="form my-4">
-                    <h3>Создать пост</h3>
-                    <input type="text" name="title" placeholder="Заголовок поста" class="form-control my-2" required>
-                    <textarea name="text" rows="5" placeholder="Текст поста" class="form-control my-2" required></textarea>
-                    <input type="file" name="file" class="form-control my-2">
-=======
-                <!-- Форма для создания постов -->
-                <form method="POST" action="profile.php" class="form my-4">
-                    <h3>Создать пост</h3>
-                    <input type="text" name="title" placeholder="Заголовок поста" class="form-control my-2" required>
-                    <textarea name="text" rows="5" placeholder="Текст поста" class="form-control my-2" required></textarea>
->>>>>>> 9b44337f16a75bffa1859d53ce3f5a127cc85e64
->>>>>>> 07567a919c4b45d5551dbee9cb6e05fc80878c30
                     <button type="submit" name="submit" class="btn btn-primary">Опубликовать</button>
                 </form>
             </div>
