@@ -1,3 +1,34 @@
+<?php
+require_once('bd.php');  // Подключаем файл для работы с БД
+
+// Проверяем подключение к базе данных
+$link = mysqli_connect('127.0.0.1', 'root', 'password', 'first');
+if (!$link) {
+    die("Ошибка подключения к базе данных: " . mysqli_connect_error());
+}
+
+if (isset($_POST['submit'])) {
+    $title = trim($_POST['title']);
+    $main_text = trim($_POST['text']);
+
+    // Проверка на заполнение полей
+    if (!$title || !$main_text) {
+        die("Заполните все поля.");
+    }
+
+    // Добавляем отладку SQL-запроса
+    $sql = "INSERT INTO posts (title, main_text) VALUES ('$title', '$main_text')";
+    if (!mysqli_query($link, $sql)) {
+        die("Не удалось добавить пост: " . mysqli_error($link));
+    } else {
+        echo "Пост успешно добавлен!";
+    }
+}
+
+// Закрываем соединение с базой данных
+mysqli_close($link);
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -37,6 +68,14 @@
                     На данный момент я активно изучаю современные методы защиты от атак и развиваю навыки работы с SOC. Я уверен, что будущее за защитой данных, и стремлюсь внести свой вклад в эту область.
                 </p>
                 <button id="toggle-btn" class="btn btn-primary my-4">Показать другую картинку</button>
+
+                <!-- Форма для создания постов -->
+                <form method="POST" action="profile.php" class="form my-4">
+                    <h3>Создать пост</h3>
+                    <input type="text" name="title" placeholder="Заголовок поста" class="form-control my-2" required>
+                    <textarea name="text" rows="5" placeholder="Текст поста" class="form-control my-2" required></textarea>
+                    <button type="submit" name="submit" class="btn btn-primary">Опубликовать</button>
+                </form>
             </div>
             <div class="col-4 text-center">
                 <div class="profile_photo">
