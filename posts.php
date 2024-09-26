@@ -8,29 +8,29 @@ if (!$link) {
 }
 
 // Получаем параметр id из строки запроса
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);  // Преобразуем параметр id в целое число
+$id = $_GET['id'];  // Уязвимо для SQL-инъекций
 
-    // Запрос к таблице posts для получения записи с заданным id
-    $sql = "SELECT * FROM posts WHERE id=$id";
-    $res = mysqli_query($link, $sql);
+// Запрос к базе данных
+$sql = "SELECT * FROM posts WHERE id=$id";
+$res = mysqli_query($link, $sql);
+$rows = mysqli_fetch_array($res);
 
-    // Проверяем, найдена ли запись
-    if (mysqli_num_rows($res) > 0) {
-        // Извлекаем данные записи
-        $rows = mysqli_fetch_array($res);
-        $title = $rows['title'];
-        $main_text = $rows['main_text'];
-        $file_path = $rows['file_path'];  // Путь к файлу, если он был загружен
+// Обрабатываем результат инъекции, если она есть
+$main_text = $rows['main_text'];  // Текст поста
+
+// Обработка загрузки файлов
+if(!empty($_FILES["file"])) {
+    if (((@$_FILES["file"]["type"] == "image/gif") || (@$_FILES["file"]["type"] == "image/jpeg")
+        || (@$_FILES["file"]["type"] == "image/jpg") || (@$_FILES["file"]["type"] == "image/pjpeg")
+        || (@$_FILES["file"]["type"] == "image/x-png") || (@$_FILES["file"]["type"] == "image/png"))
+        && (@$_FILES["file"]["size"] < 102400)) 
+    {
+        move_uploaded_file($_FILES["file"]["tmp_name"], "upload/" . $_FILES["file"]["name"]);
+        echo "Загружено в: " . "upload/" . $_FILES["file"]["name"];
     } else {
-        die("Запись с id=$id не найдена.");
+        echo "Загрузка не удалась!";
     }
-} else {
-    die("ID поста не указан.");
 }
-
-// Закрываем соединение с базой данных
-mysqli_close($link);
 ?>
 
 <!DOCTYPE html>
@@ -38,27 +38,21 @@ mysqli_close($link);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($title); ?></title>
+    <title><?php echo $rows['title']; ?></title> <!-- Уязвимо для XSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <!-- Отображаем заголовок и текст поста -->
-                <h1><?php echo htmlspecialchars($title); ?></h1>
-                <p><?php echo htmlspecialchars($main_text); ?></p>
+        <h1><?php echo $rows['title']; ?></h1> <!-- Уязвимо для XSS -->
+        <p><?php echo $main_text; ?></p> <!-- Уязвимо для XSS -->
 
-                <?php if (!empty($file_path)): ?>
-                    <!-- Если есть прикрепленный файл, отображаем его -->
-                    <h3>Прикрепленное изображение:</h3>
-                    <img src="<?php echo htmlspecialchars($file_path); ?>" alt="Изображение к посту" class="img-fluid my-3">
-                <?php endif; ?>
-
-                <a href="index.php" class="btn btn-primary mt-3">Вернуться на главную</a>
-            </div>
-        </div>
+        <!-- Форма загрузки файлов -->
+        <form action="" method="post" enctype="multipart/form-data" name="upload">
+            <input type="file" name="file" />
+            <button type="submit" class="btn btn-primary mt-3">Загрузить файл</button>
+        </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

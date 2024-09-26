@@ -7,33 +7,48 @@ if (isset($_POST['submit'])) {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // Выводим значения логина и пароля для проверки
-    echo "Логин: " . htmlspecialchars($username) . "<br>";
-    echo "Пароль: " . htmlspecialchars($password) . "<br>";
+    // Выводим значения логина и пароля без экранирования (уязвимо для XSS)
+    echo "Логин: " . $username . "<br>"; // Уязвимо для XSS
+    echo "Пароль: " . $password . "<br>"; // Уязвимо для XSS
 
-    // Используем подготовленный запрос
-    $stmt = mysqli_prepare($link, "SELECT * FROM users WHERE username = ? AND password = ?");
-    mysqli_stmt_bind_param($stmt, "ss", $username, $password);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
+    // Выполняем обычный запрос, уязвимый для SQL-инъекций
+    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+    $result = mysqli_query($link, $sql);
 
     // Добавляем вывод количества строк, найденных в запросе
     $num_rows = mysqli_num_rows($result);
     echo "Количество найденных строк: " . $num_rows . "<br>";
 
-    if ($num_rows == 1) {
+    if ($num_rows > 0) {
+        // Выводим все строки, найденные запросом
+        echo "<h3>Результаты запроса:</h3>";
+        echo "<table border='1'>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                </tr>";
+        
+        // Получаем строки из результата и выводим их
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<tr>
+                    <td>" . $row['id'] . "</td>
+                    <td>" . $row['email'] . "</td>
+                    <td>" . $row['username'] . "</td>
+                    <td>" . $row['password'] . "</td>
+                  </tr>";
+        }
+        echo "</table>";
+        
         setcookie("User", $username, time() + 7200); // Кука на 2 часа
-        header('Location: profile.php');
     } else {
         echo "Неправильный логин или пароль.<br>";
     }
 
-    mysqli_stmt_close($stmt);
     mysqli_close($link);
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="ru">
